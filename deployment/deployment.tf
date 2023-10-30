@@ -1,60 +1,63 @@
+# Connecting to the Kubernetes cluster to run a pod and a service related to it
 provider "kubernetes" {
-  config_path = "~/.kube/config"
+  config_path = var.k8s_config_path
 }
 
+# Creating the service to expose the pod on the internal network
 resource "kubernetes_service" "microservice1_service" {
   metadata {
-    name      = "microservice1-service"
-    namespace = "default"
+    name      = var.service_name
+    namespace = var.service_namespace
   }
 
   spec {
     selector = {
-      app = "microservice1"
+      app = var.deployment_name  # Select pods with the label "app=microservice1"
     }
 
     port {
-      protocol   = "TCP"
-      port       = 8080
+      protocol   = "TCP"  # Protocol of the port
+      port       = var.service_port
     }
 
-    type = "ClusterIP"
+    type = "ClusterIP"  # Type of the service
   }
 }
 
+# Deploying a pod using a Docker image containing the microservice
 resource "kubernetes_deployment" "microservice1_deployment" {
   metadata {
-    name      = "microservice1"
-    namespace = "default"
+    name      = var.deployment_name
+    namespace = var.deployment_namespace
 
     labels = {
-      app = "microservice1"
+      app = var.deployment_name  # Deployment label
     }
   }
 
   spec {
-    replicas = 1
+    replicas = 1  # Number of pods to create
 
     selector {
       match_labels = {
-        app = "microservice1"
+        app = var.deployment_name  # Match pods with the label "app=microservice1"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "microservice1"
+          app = var.deployment_name  # Label for the pod
         }
       }
 
       spec {
         container {
-          name            = "microservice1-container"
-          image           = "antoniocapizzi95/terraform-deploy-test:latest"
+          name            = var.container_name
+          image           = var.container_image
           image_pull_policy = "Always"
           port {
-            container_port  = 8080
+            container_port  = var.service_port
           }
         }
       }
