@@ -28,6 +28,8 @@ The microservice (developed in Golang) is containerised with Docker (via a Docke
 
 For simplicity in this project, both the pod and the Ingress have been placed in the 'default' namespace.
 
+Also due to the limited free tier, it is not possible to leave the cluster running and reachable for a long time.
+
 ## Running the Project
 
 Before starting the deployment process, make sure you have the Azure CLI installed locally and have logged in to your Azure account using the `az login` command.
